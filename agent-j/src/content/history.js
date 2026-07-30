@@ -11,7 +11,16 @@ export class ContentHistory {
     const recent = this.poolItems.get(poolKey) ?? [];
     const recentIds = new Set(recent);
     const available = entries.filter((entry) => !recentIds.has(entry.id));
-    const source = available.length > 0 ? available : entries;
+    const withoutImmediateRepeat = entries.filter(
+      (entry) => entry.id !== recent.at(-1),
+    );
+    let source = available;
+    if (source.length === 0) {
+      source =
+        withoutImmediateRepeat.length > 0
+          ? withoutImmediateRepeat
+          : entries;
+    }
     const totalWeight = source.reduce(
       (sum, entry) => sum + (entry.weight ?? 1),
       0,

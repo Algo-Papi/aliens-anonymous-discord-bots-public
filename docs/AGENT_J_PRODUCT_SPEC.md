@@ -453,9 +453,10 @@ Fallback witnesses, selected randomly when no member is eligible:
 - `the haunted fax machine from Evidence Room B`
 - `a government clone still wearing the original's name tag`
 
-Memory Audit rotates through eight live-witness sentence structures and eight
-fictional/no-live-witness structures. Word-bank history prevents immediate
-template reuse. The 60% live-witness ceiling remains unchanged.
+Memory Audit rotates through eight premise-neutral witness structures. The
+activity selector supplies either an eligible recent member or one of the
+fictional fallbacks above, so the sentence remains grammatical without
+discarding the selected witness. Word-bank history prevents immediate reuse.
 
 ## 8. Scan Subject specification
 
@@ -479,18 +480,14 @@ Disposition
 Scan confidence
 ```
 
-Every field is freshly randomized on every scan. Do not assign a permanent
-species, anomaly, or origin.
+Select one reviewed scenario family first. Species, origin, anomaly, threat,
+weakness, disposition, and observation may vary only within that family. This
+keeps every embed on one comic premise while preserving fresh combinations.
+Do not assign a permanent species, anomaly, or origin to a member.
 
-Recommended initial pool sizes:
-
-- Species: 40
-- Origin: 30
-- Anatomical anomaly: 50
-- Threat level: 30
-- Known weakness: 40
-- Disposition: 30
-- Scan confidence formatting: 15
+The initial implementation has six scenario families with at least four
+reviewed variants per field and four complete observation templates per
+family.
 
 ### Bureau observation grammar
 
@@ -524,8 +521,12 @@ CORONER:
 The night-shift coroner interviewed @Y after @X {action W}; the final report states {outcome V}.
 ```
 
-Each family must have its own compatible Z/W/V pools. Do not share a clause
-across families unless its grammar is explicitly compatible.
+In the live implementation, each family owns complete reviewed observation
+templates rather than independently mixed Z/W/V fragments. Every observation
+must mention the target and witness exactly once. Never make the entire
+`{witness}` placeholder possessive: fictional compound witnesses such as
+`a government clone still wearing the original's name tag` must remain
+grammatical.
 
 ### Scan output budget
 
@@ -583,35 +584,21 @@ Create at least eight separately tested families:
 8. Cult initiation
 9. Classified former employment
 
-Recommended pool sizes:
-
-- Period/date: 20
-- Location: 30
-- Accomplice/witness reaction: 35
-- Central incident: 60
-- Object/evidence: 40
-- Neuralyzation reason: 40
-- Residual symptom: 50
-- Treatment: 30
-
-At least half of the central incidents and residual symptoms should be in the
-`spicy` or `dark` tone. Dark content remains fictional and absurd.
+The initial implementation contains four complete dossiers for each of the
+nine families, for 36 total. A dossier binds its period, location, reason,
+evidence, residual symptom, and treatment to one reviewed premise. Never mix
+those fields across dossiers. Dark content remains fictional and absurd.
 
 ### Narrative construction
 
-Memory Audit should use complete paragraph templates rather than displaying
-every slot as a list. A family owns:
+Memory Audit uses one complete dossier rather than independently selecting
+each clause. Its narrative joins the dossier's period, location, witness
+statement, and neuralyzation reason; evidence, residual symptom, and treatment
+remain separate embed fields.
 
-- opening sentence
-- escalation sentence
-- optional witness sentence
-- neuralyzation explanation
-
-The residual symptom and treatment appear as separate embed fields.
-
-Use a recently active eligible witness in no more than 60% of audits. The
-remaining audits should use a fictional accomplice so the same channel members
-are not constantly dragged into reports.
+The activity selector supplies either an eligible recent member or a fictional
+fallback. Witness prose must remain premise-neutral and grammatical for both
+singular and plural fallbacks.
 
 ### Memory Audit output budget
 
@@ -639,26 +626,18 @@ Defensive response
 Known weakness
 Likely casualty
 Containment protocol
-Survival probability
-Sensor confidence
+Mission success probability
 ```
 
-Recommended pool sizes:
+The initial implementation has 12 scenario families distributed across all six
+tiers, with at least four reviewed variants per report field.
 
-- Classification: 30
-- Combat capability: 40
-- Primary attack: 35
-- Defensive response: 35
-- Weakness: 40
-- Likely casualty: 30
-- Containment protocol: 30
+Choose one reviewed, premise-locked scenario first. Every classification,
+capability, attack, defense, weakness, casualty, and containment line must come
+from that same scenario. Contradictory cross-tier fields are not allowed.
 
-Choose a random internal threat tier from 0–5. Pool items may declare compatible
-tiers. In 80% of results, select compatible items. In 20%, deliberately select
-one contradictory field for comedic effect—for example, a
-`Civilization-Ending Dumbass` whose only attack is an unsolicited voice message.
-
-Generate survival probability from weighted tier ranges, not uniformly:
+Generate mission success probability from the selected scenario's tier-safe
+range, not uniformly:
 
 - Tier 0: 85–100%
 - Tier 1: 70–95%

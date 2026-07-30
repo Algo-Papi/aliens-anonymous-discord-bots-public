@@ -1,38 +1,8 @@
-import {
-  ANOMALIES,
-  COMBAT_CAPABILITIES,
-  CONTAINMENT_PROTOCOLS,
-  DEFENSIVE_RESPONSES,
-  DISPOSITIONS,
-  LIKELY_CASUALTIES,
-  MEMORY_CONFIDENCE,
-  MEMORY_EVIDENCE,
-  MEMORY_FAMILIES,
-  MEMORY_LOCATIONS,
-  MEMORY_PERIODS,
-  MEMORY_REASONS,
-  MEMORY_RESIDUALS,
-  MEMORY_TREATMENTS,
-  OBSERVATION_FAMILIES,
-  ORIGINS,
-  PRIMARY_ATTACKS,
-  SCAN_CONFIDENCE,
-  SCAN_THREATS,
-  SCAN_WEAKNESSES,
-  SENSOR_CONFIDENCE,
-  SPECIES,
-  THREAT_CLASSIFICATIONS,
-  THREAT_WEAKNESSES,
-} from "./pools.js";
-import { ContentHistory } from "./history.js";
+import { ContentHistory, entries } from "./history.js";
+import { MEMORY_DOSSIERS } from "./memory-scenarios.js";
 import { RandomSource } from "./random.js";
-import {
-  MEMORY_OPENERS,
-  pickVoice,
-  REPORT_FOOTERS,
-  SCAN_OPENERS,
-  THREAT_OPENERS,
-} from "./voice.js";
+import { SCAN_SCENARIOS } from "./scan-scenarios.js";
+import { THREAT_SCENARIOS } from "./threat-scenarios.js";
 
 const REPORT_COLORS = Object.freeze({
   scan: 0x20c997,
@@ -56,45 +26,121 @@ export const MEMORY_WITNESS_TEMPLATES = renderEntries(
   "memory-witness",
   [
     (witness) =>
-      `${witness} witnessed the event, signed the wrong nondisclosure form, and has been nervous around ceiling fans ever since.`,
+      `${witness} confirmed the timeline, then asked Legal to remove their name from every future edition.`,
     (witness) =>
-      `${witness} provided corroborating testimony after being assured the probe sketches would remain sealed.`,
+      `${witness} corroborated the account and immediately regretted being the most credible person in the room.`,
     (witness) =>
-      `${witness} was recovered nearby wearing one shoe, two tracking devices, and somebody else's expression.`,
+      `${witness} reviewed the evidence, said “that tracks,” and requested a different planet.`,
     (witness) =>
-      `${witness} remembers the incident clearly because the neuralyzer flashed backward and restored a worse memory.`,
+      `${witness} identified the subject without hesitation; the hesitation started after the details.`,
     (witness) =>
-      `${witness} identified the subject from a lineup containing three clones and an unusually confident cadaver.`,
+      `${witness} signed the statement after Agent J promised the paperwork would be less traumatic than the memory.`,
     (witness) =>
-      `${witness} attempted to leave the scene but discovered the scene had followed them home.`,
+      `${witness} supplied a matching account and one deeply unhelpful drawing.`,
     (witness) =>
-      `${witness} filed an eyewitness statement, a medical claim, and one request to be transferred to a quieter timeline.`,
+      `${witness} placed the subject at the scene and then moved behind a locked door.`,
     (witness) =>
-      `${witness} confirmed every detail before entering witness protection inside a condemned vending machine.`,
+      `${witness} confirmed the sequence, declined follow-up questions, and blamed the Bureau dental plan.`,
   ],
 );
 
-export const MEMORY_SOLO_TEMPLATES = renderEntries("memory-solo", [
-  () =>
-    "A fictional Bureau contractor listed only as Kevin declined to identify which half of the story was his fault.",
-  () =>
-    "The only other witness was a rental clone whose deposit had already been forfeited.",
-  () =>
-    "Surveillance footage shows an unidentified intern quietly resigning through a locked emergency exit.",
-  () =>
-    "A dead livestock inspector corroborated the account through channels Legal refuses to describe.",
-  () =>
-    "No civilian witness survived with an intact calendar, so the Bureau interviewed the motel ice machine.",
-  () =>
-    "The scene was otherwise empty except for one Worm Guy pretending to be load-bearing.",
-  () =>
-    "A government Roomba recorded the event, developed religion, and erased itself.",
-  () =>
-    "The backup witness turned out to be the subject wearing a cheaper disguise and tomorrow's shoes.",
+const SCAN_CONFIDENCE = entries("coherent-scan-confidence", [
+  "99% — three independent passes returned the same diagnosis.",
+  "96% — the scanner, backup scanner, and Agent J all agree.",
+  "93% — the only disputed reading came from the subject.",
+  "90% — the hardware is stable; the subject remains the variable.",
 ]);
+
+const MEMORY_CONFIDENCE = entries("coherent-memory-confidence", [
+  "98% — the timeline, witness account, and physical evidence agree.",
+  "95% — the recovered sequence passed a second neural review.",
+  "92% — one damaged frame remains, but the incident is intact.",
+  "89% — the memory resisted recovery, not the conclusion.",
+]);
+
+const SCAN_FOOTERS = entries("coherent-scan-footer", [
+  "Agent J • “I make this look good.” The organism remains under appeal.",
+  "M.I.B. Xenobiology • The scanner is fine; the diagnosis is personal.",
+  "Agent J • Filed under: somebody else's evolutionary problem.",
+  "Bureau field note • Do not feed, flatter, or finance the subject.",
+  "M.I.B. Xenobiology • Anatomy verified. Warranty denied.",
+  "Agent J • Case closed; the specimen unfortunately remains open.",
+  "Bureau scan archive • One premise, several bad decisions.",
+  "Agent J • The suit survived contact. Barely.",
+]);
+
+const MEMORY_FOOTERS = entries("coherent-memory-footer", [
+  "Agent J • I recovered the memory. Therapy remains outside Bureau jurisdiction.",
+  "M.I.B. Neural Hygiene • Some thoughts deserve an unmarked grave.",
+  "Agent J • I restored the truth and immediately regretted enabling backups.",
+  "Memory file sealed • Counseling, litigation, and a less curious species pending.",
+  "Bureau notice • Remembering is not the same as receiving clearance.",
+  "Agent J • Truth restored. Dignity was never included in the recovery point.",
+]);
+
+const THREAT_FOOTERS = entries("coherent-threat-footer", [
+  "Agent J • One threat. One plan. No mystery.",
+  "M.I.B. Tactical • Ugly scenario. Clean readout.",
+  "Agent J • Threat found. Odds set. Suit immaculate.",
+  "Bureau • Follow protocol. Stay out of evidence.",
+  "Agent J • The math is final. Review your options.",
+  "M.I.B. Tactical • Containment beats improvisation.",
+]);
+
+const MEMORY_FAMILY_POOLS = Object.freeze(
+  [...new Set(MEMORY_DOSSIERS.map(({ familyId }) => familyId))].map(
+    (familyId) =>
+      Object.freeze({
+        id: familyId,
+        dossiers: Object.freeze(
+          MEMORY_DOSSIERS.filter(
+            (dossier) => dossier.familyId === familyId,
+          ),
+        ),
+      }),
+  ),
+);
+
+const ALL_THREAT_SCENARIOS = Object.freeze(
+  THREAT_SCENARIOS.flatMap((group) => group.scenarios),
+);
 
 function choose(history, key, pool, random) {
   return history.choose(key, pool, random);
+}
+
+function chooseText(history, key, scenarioId, slot, values, random) {
+  return choose(
+    history,
+    key,
+    values.map((text, index) => ({
+      id: `${scenarioId}-${slot}-${String(index + 1).padStart(2, "0")}`,
+      text,
+      weight: 1,
+    })),
+    random,
+  );
+}
+
+function sentenceCaseSubject(value) {
+  if (value.startsWith("<@")) return value;
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+}
+
+function renderObservation(template, { targetMention, witnessText }) {
+  const renderedWitness = template.trimStart().startsWith("{witness}")
+    ? sentenceCaseSubject(witnessText)
+    : witnessText;
+  return template
+    .replace("{target}", targetMention)
+    .replace("{witness}", renderedWitness);
+}
+
+function titleCaseId(id) {
+  return id
+    .split("-")
+    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`)
+    .join(" ");
 }
 
 function caseNumber(prefix, random) {
@@ -114,39 +160,17 @@ function reportLength(report) {
   );
 }
 
-function finalizeReport(command, report, signature, history) {
+function finalizeReport(command, report, signature, composition) {
   const length = reportLength(report);
   return {
     ...report,
     command,
     signature,
+    composition,
     length,
     color: REPORT_COLORS[command],
     allowedMentions: { parse: [], users: [] },
   };
-}
-
-function compatibleWithTier(entry, tier) {
-  return entry.tiers?.includes(tier);
-}
-
-function chooseTiered(
-  history,
-  key,
-  pool,
-  tier,
-  random,
-  { contradiction = false } = {},
-) {
-  let compatible = pool.filter((entry) =>
-    contradiction
-      ? !compatibleWithTier(entry, tier)
-      : compatibleWithTier(entry, tier),
-  );
-  if (compatible.length === 0) {
-    compatible = pool;
-  }
-  return choose(history, `${key}:tier-${tier}`, compatible, random);
 }
 
 export class ReportGenerator {
@@ -156,48 +180,52 @@ export class ReportGenerator {
   } = {}) {
     this.random = random;
     this.history = history;
+    this.lastDeliveredConfidence = new Map();
+    this.lastDeliveredScenario = new Map();
   }
 
   generateScan({ targetMention, witnessText }) {
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      const family =
-        OBSERVATION_FAMILIES[
-          this.random.int(0, OBSERVATION_FAMILIES.length)
-        ];
+      const scenario = choose(
+        this.history,
+        "scan:scenario",
+        SCAN_SCENARIOS,
+        this.random,
+      );
       const species = choose(
         this.history,
-        "scan:species",
-        SPECIES,
+        `scan:${scenario.id}:species`,
+        scenario.species,
         this.random,
       );
       const origin = choose(
         this.history,
-        "scan:origin",
-        ORIGINS,
+        `scan:${scenario.id}:origin`,
+        scenario.origins,
         this.random,
       );
       const anomaly = choose(
         this.history,
-        "scan:anomaly",
-        ANOMALIES,
+        `scan:${scenario.id}:anomaly`,
+        scenario.anomalies,
         this.random,
       );
       const threat = choose(
         this.history,
-        "scan:threat",
-        SCAN_THREATS,
+        `scan:${scenario.id}:threat`,
+        scenario.threatLabels,
         this.random,
       );
       const weakness = choose(
         this.history,
-        "scan:weakness",
-        SCAN_WEAKNESSES,
+        `scan:${scenario.id}:weakness`,
+        scenario.weaknesses,
         this.random,
       );
       const disposition = choose(
         this.history,
-        "scan:disposition",
-        DISPOSITIONS,
+        `scan:${scenario.id}:disposition`,
+        scenario.dispositions,
         this.random,
       );
       const confidence = choose(
@@ -206,42 +234,25 @@ export class ReportGenerator {
         SCAN_CONFIDENCE,
         this.random,
       );
-      const reaction = choose(
+      const observationTemplate = choose(
         this.history,
-        `scan:${family.id}:reaction`,
-        family.reactions,
+        `scan:${scenario.id}:observation`,
+        scenario.observations,
         this.random,
       );
-      const action = choose(
-        this.history,
-        `scan:${family.id}:action`,
-        family.actions,
-        this.random,
-      );
-      const outcome = choose(
-        this.history,
-        `scan:${family.id}:outcome`,
-        family.outcomes,
-        this.random,
-      );
-      const observation = family.render(
-        witnessText,
+      const observation = renderObservation(observationTemplate.template, {
         targetMention,
-        reaction.text,
-        action.text,
-        outcome.text,
-      );
+        witnessText,
+      });
       const signature = [
+        scenario.id,
         species.id,
         origin.id,
         anomaly.id,
         threat.id,
         weakness.id,
         disposition.id,
-        family.id,
-        reaction.id,
-        action.id,
-        outcome.id,
+        observationTemplate.id,
       ].join("|");
       const report = finalizeReport(
         "scan",
@@ -250,7 +261,8 @@ export class ReportGenerator {
           description:
             `**Subject:** ${targetMention}\n` +
             `**Case:** \`${caseNumber("XENO", this.random)}\`\n\n` +
-            pickVoice(SCAN_OPENERS, this.random),
+            "Agent J reviewed every pass. Unfortunately, they all confirmed the same embarrassing diagnosis.\n\n" +
+            `**Bureau theory:** ${scenario.premise}`,
           fields: [
             { name: "Species", value: species.text, inline: true },
             { name: "Origin", value: origin.text, inline: true },
@@ -284,18 +296,22 @@ export class ReportGenerator {
           footer: choose(
             this.history,
             "scan:footer",
-            REPORT_FOOTERS.scan,
+            SCAN_FOOTERS,
             this.random,
           ).text,
         },
         signature,
-        this.history,
+        { scenarioId: scenario.id },
       );
       if (
         report.length <= 1_800 &&
-        !this.history.hasRecentSignature("scan", signature)
+        !this.history.hasRecentSignature("scan", signature) &&
+        this.lastDeliveredScenario.get("scan") !== scenario.id &&
+        this.lastDeliveredConfidence.get("scan") !== confidence.id
       ) {
         this.history.recordSignature("scan", signature);
+        this.lastDeliveredScenario.set("scan", scenario.id);
+        this.lastDeliveredConfidence.set("scan", confidence.id);
         return report;
       }
     }
@@ -304,56 +320,16 @@ export class ReportGenerator {
 
   generateMemory({ targetMention, witnessText }) {
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      const family =
-        MEMORY_FAMILIES[
-          this.random.int(0, MEMORY_FAMILIES.length)
-        ];
-      const period = choose(
+      const family = choose(
         this.history,
-        "memory:period",
-        MEMORY_PERIODS,
+        "memory:family",
+        MEMORY_FAMILY_POOLS,
         this.random,
       );
-      const location = choose(
+      const dossier = choose(
         this.history,
-        "memory:location",
-        MEMORY_LOCATIONS,
-        this.random,
-      );
-      const incident = choose(
-        this.history,
-        `memory:${family.id}:incident`,
-        family.incidents,
-        this.random,
-      );
-      const escalation = choose(
-        this.history,
-        `memory:${family.id}:escalation`,
-        family.escalations,
-        this.random,
-      );
-      const reason = choose(
-        this.history,
-        "memory:reason",
-        MEMORY_REASONS,
-        this.random,
-      );
-      const evidence = choose(
-        this.history,
-        "memory:evidence",
-        MEMORY_EVIDENCE,
-        this.random,
-      );
-      const residual = choose(
-        this.history,
-        "memory:residual",
-        MEMORY_RESIDUALS,
-        this.random,
-      );
-      const treatment = choose(
-        this.history,
-        "memory:treatment",
-        MEMORY_TREATMENTS,
+        `memory:${family.id}:dossier`,
+        family.dossiers,
         this.random,
       );
       const confidence = choose(
@@ -362,29 +338,23 @@ export class ReportGenerator {
         MEMORY_CONFIDENCE,
         this.random,
       );
-      const usesWitness = this.random.chance(0.6);
       const witnessTemplate = choose(
         this.history,
-        usesWitness ? "memory:witness-template" : "memory:solo-template",
-        usesWitness ? MEMORY_WITNESS_TEMPLATES : MEMORY_SOLO_TEMPLATES,
+        "memory:witness-template",
+        MEMORY_WITNESS_TEMPLATES,
         this.random,
       );
-      const witnessSentence = witnessTemplate.render(witnessText);
+      const witnessSentence = witnessTemplate.render(
+        sentenceCaseSubject(witnessText),
+      );
       const narrative =
-        `During ${period.text}, ${targetMention} ${incident.text} at ${location.text}. ` +
-        `${witnessSentence} ${escalation.text}\n\n` +
-        `The Bureau erased the event because ${reason.text}. ` +
-        `The evidence locker still contains ${evidence.text}.`;
+        `During ${dossier.period}, Bureau records place you at ${dossier.location}. ` +
+        `${witnessSentence}\n\n` +
+        `The wipe order says the Bureau intervened because ${dossier.reason}.`;
       const signature = [
-        family.id,
-        period.id,
-        location.id,
-        incident.id,
-        escalation.id,
-        reason.id,
-        evidence.id,
-        residual.id,
-        treatment.id,
+        dossier.id,
+        witnessTemplate.id,
+        confidence.id,
       ].join("|");
       const report = finalizeReport(
         "memory",
@@ -393,21 +363,27 @@ export class ReportGenerator {
           description:
             `**Subject:** ${targetMention}\n` +
             `**File:** \`${caseNumber("MEM", this.random)}\`\n\n` +
-            `${pickVoice(MEMORY_OPENERS, this.random)}\n\n${narrative}`,
+            "Agent J recovered the case file. Against his advice, it still has audio.\n\n" +
+            `${narrative}`,
           fields: [
             {
-              name: "Reason for neuralyzation",
-              value: reason.text,
+              name: "Memory classification",
+              value: titleCaseId(dossier.familyId),
+              inline: true,
+            },
+            {
+              name: "Evidence recovered",
+              value: `${sentenceCaseSubject(dossier.evidenceItem)}.`,
               inline: false,
             },
             {
               name: "Residual symptom",
-              value: residual.text,
+              value: dossier.residualSymptom,
               inline: false,
             },
             {
               name: "Recommended treatment",
-              value: treatment.text,
+              value: dossier.treatment,
               inline: false,
             },
             {
@@ -419,18 +395,25 @@ export class ReportGenerator {
           footer: choose(
             this.history,
             "memory:footer",
-            REPORT_FOOTERS.memory,
+            MEMORY_FOOTERS,
             this.random,
           ).text,
         },
         signature,
-        this.history,
+        {
+          scenarioId: dossier.familyId,
+          dossierId: dossier.id,
+        },
       );
       if (
         report.length <= 1_800 &&
-        !this.history.hasRecentSignature("memory", signature)
+        !this.history.hasRecentSignature("memory", signature) &&
+        this.lastDeliveredScenario.get("memory") !== family.id &&
+        this.lastDeliveredConfidence.get("memory") !== confidence.id
       ) {
         this.history.recordSignature("memory", signature);
+        this.lastDeliveredScenario.set("memory", family.id);
+        this.lastDeliveredConfidence.set("memory", confidence.id);
         return report;
       }
     }
@@ -439,76 +422,85 @@ export class ReportGenerator {
 
   generateThreat({ targetMention }) {
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      const tier = this.random.int(0, 6);
-      const contradiction = this.random.chance(0.2);
-      const classification = chooseTiered(
+      const scenario = choose(
         this.history,
-        "threat:classification",
-        THREAT_CLASSIFICATIONS,
-        tier,
+        "threat:scenario",
+        ALL_THREAT_SCENARIOS,
         this.random,
       );
-      const capability = chooseTiered(
+      const tier = scenario.tier;
+      const intro = chooseText(
         this.history,
-        "threat:capability",
-        COMBAT_CAPABILITIES,
-        tier,
+        `threat:${scenario.id}:intro`,
+        scenario.id,
+        "intro",
+        scenario.intros,
         this.random,
       );
-      const attack = chooseTiered(
+      const classification = chooseText(
         this.history,
-        "threat:attack",
-        PRIMARY_ATTACKS,
-        tier,
-        this.random,
-        { contradiction },
-      );
-      const defense = chooseTiered(
-        this.history,
-        "threat:defense",
-        DEFENSIVE_RESPONSES,
-        tier,
+        `threat:${scenario.id}:classification`,
+        scenario.id,
+        "classification",
+        scenario.classification,
         this.random,
       );
-      const weakness = chooseTiered(
+      const capability = chooseText(
         this.history,
-        "threat:weakness",
-        THREAT_WEAKNESSES,
-        tier,
+        `threat:${scenario.id}:capability`,
+        scenario.id,
+        "capability",
+        scenario.capability,
         this.random,
       );
-      const casualty = chooseTiered(
+      const attack = chooseText(
         this.history,
-        "threat:casualty",
-        LIKELY_CASUALTIES,
-        tier,
+        `threat:${scenario.id}:attack`,
+        scenario.id,
+        "attack",
+        scenario.attack,
         this.random,
       );
-      const protocol = chooseTiered(
+      const defense = chooseText(
         this.history,
-        "threat:protocol",
-        CONTAINMENT_PROTOCOLS,
-        tier,
+        `threat:${scenario.id}:defense`,
+        scenario.id,
+        "defense",
+        scenario.defense,
         this.random,
       );
-      const confidence = choose(
+      const weakness = chooseText(
         this.history,
-        "threat:sensor-confidence",
-        SENSOR_CONFIDENCE,
+        `threat:${scenario.id}:weakness`,
+        scenario.id,
+        "weakness",
+        scenario.weakness,
         this.random,
       );
-      const ranges = [
-        [85, 101],
-        [70, 96],
-        [45, 86],
-        [20, 71],
-        [5, 46],
-        [1, 26],
-      ];
-      const [min, max] = ranges[tier];
-      const survival = this.random.int(min, max);
+      const casualty = chooseText(
+        this.history,
+        `threat:${scenario.id}:casualty`,
+        scenario.id,
+        "casualty",
+        scenario.casualty,
+        this.random,
+      );
+      const protocol = chooseText(
+        this.history,
+        `threat:${scenario.id}:containment`,
+        scenario.id,
+        "containment",
+        scenario.containment,
+        this.random,
+      );
+      const survival = this.random.int(
+        scenario.survivalRange.min,
+        scenario.survivalRange.max + 1,
+      );
       const signature = [
         tier,
+        scenario.id,
+        intro.id,
         classification.id,
         capability.id,
         attack.id,
@@ -524,12 +516,8 @@ export class ReportGenerator {
           description:
             `**Subject:** ${targetMention}\n` +
             `**Assessment:** \`${caseNumber("THREAT", this.random)}\`\n\n` +
-            `${pickVoice(THREAT_OPENERS, this.random)}\n\n` +
-            `Agent J rates this subject Tier ${tier}. ${
-              contradiction
-                ? "One reading is catastrophically inconsistent, which somehow makes the file worse."
-                : "The numbers agree, and none of them are flattering."
-            }`,
+            `${intro.text}\n\n` +
+            `**Threat tier:** ${tier}`,
           fields: [
             {
               name: "Threat classification",
@@ -567,31 +555,28 @@ export class ReportGenerator {
               inline: false,
             },
             {
-              name: "Survival probability",
+              name: "Mission success probability",
               value: `${survival}%`,
               inline: true,
-            },
-            {
-              name: "Sensor confidence",
-              value: confidence.text,
-              inline: false,
             },
           ],
           footer: choose(
             this.history,
             "threat:footer",
-            REPORT_FOOTERS.threat,
+            THREAT_FOOTERS,
             this.random,
           ).text,
         },
         signature,
-        this.history,
+        { scenarioId: scenario.id, tier },
       );
       if (
         report.length <= 1_500 &&
-        !this.history.hasRecentSignature("threat", signature)
+        !this.history.hasRecentSignature("threat", signature) &&
+        this.lastDeliveredScenario.get("threat") !== scenario.id
       ) {
         this.history.recordSignature("threat", signature);
+        this.lastDeliveredScenario.set("threat", scenario.id);
         return report;
       }
     }
@@ -612,9 +597,33 @@ export function validateReport(report) {
   if (/@everyone|@here/i.test(rendered)) problems.push("mass mention");
   if (/[!?.,;:]{2,}/.test(rendered)) problems.push("double punctuation");
   if (/<@[^0-9][^>]*>/.test(rendered)) problems.push("malformed mention");
+  if (/<@\d+>\s+were\b/i.test(rendered)) {
+    problems.push("mention perspective mismatch");
+  }
+  if (/(?:\uFFFD|Ã¢â‚¬|Ãƒ.|Ã‚.)/u.test(rendered)) {
+    problems.push("mojibake");
+  }
+  if (!report.composition?.scenarioId) {
+    problems.push("missing scenario metadata");
+  }
   if (report.fields.some((field) => !field.name || !field.value)) {
     problems.push("blank field");
   }
+  if (report.title.length > 256) problems.push("title limit");
+  if ((report.description?.length ?? 0) > 4_096) {
+    problems.push("description limit");
+  }
+  if (report.fields.length > 25) problems.push("field count limit");
+  if (report.fields.some((field) => field.name.length > 256)) {
+    problems.push("field name limit");
+  }
+  if (report.fields.some((field) => field.value.length > 1_024)) {
+    problems.push("field value limit");
+  }
+  if ((report.footer?.length ?? 0) > 2_048) {
+    problems.push("footer limit");
+  }
+  if (reportLength(report) > 6_000) problems.push("embed total limit");
   return problems;
 }
 

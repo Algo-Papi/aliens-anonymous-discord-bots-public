@@ -24,7 +24,7 @@
     "update-profile": "node scripts/update-bot-profile.js"
   },
   "dependencies": {
-    "better-sqlite3": "13.0.1",
+    "better-sqlite3": "13.0.2",
     "discord.js": "14.27.0",
     "dotenv": "17.2.3",
     "openai": "7.1.0"

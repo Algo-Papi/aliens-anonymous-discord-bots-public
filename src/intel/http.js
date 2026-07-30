@@ -120,7 +120,6 @@ export async function requestText(
     { code: "TIMEOUT", url },
   );
   const timeout = setTimeout(() => controller.abort(timeoutReason), timeoutMs);
-  timeout.unref?.();
 
   const abortFromCaller = () => {
     controller.abort(

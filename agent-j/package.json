@@ -1,0 +1,32 @@
+{
+  "name": "aa-agent-j",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Self-hosted member-facing entertainment, Arena, and optional research bot for Discord.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Algo-Papi/aliens-anonymous-discord-bots-public.git",
+    "directory": "agent-j"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node scripts/check-syntax.js",
+    "diagnostics": "node scripts/diagnostics.js",
+    "register": "node scripts/register-commands.js",
+    "simulate:arena": "node scripts/simulate-arena.js",
+    "simulate:economy": "node scripts/simulate-economy.js",
+    "start": "node src/index.js",
+    "test": "node --test",
+    "update-profile": "node scripts/update-bot-profile.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "13.0.1",
+    "discord.js": "14.27.0",
+    "dotenv": "17.2.3",
+    "openai": "7.1.0"
+  }
+}

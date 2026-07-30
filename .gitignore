@@ -1,0 +1,32 @@
+# Dependencies and test output
+node_modules/
+coverage/
+.nyc_output/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Runtime state
+*.log
+logs/
+data/
+*.sqlite
+*.sqlite-*
+*.db
+
+# Operating-system and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Bring your own licensed bot artwork. Local images are intentionally excluded
+# from the public template.
+assets/*
+!assets/README.md

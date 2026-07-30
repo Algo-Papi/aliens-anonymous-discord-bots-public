@@ -1,0 +1,28 @@
+{
+  "name": "aa-citation-bureau",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Self-hosted Agent K citations, archives, alerts, and community automation for Discord.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Algo-Papi/aliens-anonymous-discord-bots-public.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node scripts/check-syntax.js",
+    "check:public": "node scripts/check-public-safety.js",
+    "register": "node src/register-commands.js",
+    "start": "node src/index.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.1",
+    "discord.js": "14.27.0",
+    "dotenv": "17.2.3",
+    "fast-xml-parser": "^5.10.1"
+  }
+}

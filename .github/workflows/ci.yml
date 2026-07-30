@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            agent-j/package-lock.json
+
+      - name: Install Agent K dependencies
+        run: npm ci
+
+      - name: Check and test Agent K
+        run: |
+          npm run check
+          npm run check:public
+          npm test
+
+      - name: Install Agent J dependencies
+        working-directory: agent-j
+        run: npm ci
+
+      - name: Check, test, and simulate Agent J
+        working-directory: agent-j
+        run: |
+          npm run check
+          npm test
+          npm run simulate:arena
+          npm run simulate:economy

@@ -1,0 +1,20 @@
+.env
+node_modules/
+coverage/
+*.log
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+# The repository-level .gitignore already covers these paths. These explicit
+# rules also protect Agent J if this folder is ever extracted or reused alone.
+node_modules/
+.env
+.env.*
+!.env.example
+data/
+logs/
+*.log
+*.sqlite
+*.sqlite-*
+*.db
+coverage/
